@@ -1,20 +1,60 @@
 <?php
-// Bắt buộc phải thêm dòng này để Vercel có thể xử lý request
-require __DIR__ . '/../vendor/autoload.php';
+// Thiết lập header để cho phép truy cập từ mọi nguồn (CORS) và định dạng JSON
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
 
-// Thiết lập header để trình duyệt hiểu đây là một phản hồi JSON
-header('Content-Type: application/json');
-
-// Lấy tham số 'name' từ URL (ví dụ: /api?name=Vercel)
-$name = isset($_GET['name']) ? htmlspecialchars($_GET['name']) : 'Khách';
-
-// Tạo một mảng dữ liệu PHP
-$data = [
-    'message' => "Chào mừng, $name!",
-    'status' => 'success',
-    'timestamp' => time()
+// --- Dữ liệu giả (Giống như lấy từ Database) ---
+$products = [
+    [
+        "id" => 1,
+        "name" => "Laptop ABC",
+        "price" => 25000000,
+        "description" => "Laptop mạnh mẽ cho lập trình viên."
+    ],
+    [
+        "id" => 2,
+        "name" => "Chuột không dây XYZ",
+        "price" => 750000,
+        "description" => "Chuột công thái học, giảm mỏi tay."
+    ],
+    [
+        "id" => 3,
+        "name" => "Bàn phím cơ Pro",
+        "price" => 1800000,
+        "description" => "Trải nghiệm gõ phím tuyệt vời với Blue switch."
+    ]
 ];
 
-// Chuyển đổi mảng PHP thành chuỗi JSON và trả về
-echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+// --- Xử lý yêu cầu ---
+$response = null;
+
+// Kiểm tra xem có tham số 'id' trên URL không
+if (isset($_GET['id'])) {
+    $id = intval($_GET['id']); // Lấy ID và chuyển thành số nguyên
+    
+    // Tìm sản phẩm có ID tương ứng
+    foreach ($products as $product) {
+        if ($product['id'] == $id) {
+            $response = $product;
+            break;
+        }
+    }
+} else {
+    // Nếu không có ID, trả về tất cả sản phẩm
+    $response = $products;
+}
+
+// --- Trả về phản hồi ---
+if ($response) {
+    // Nếu tìm thấy dữ liệu, trả về status 200 OK
+    http_response_code(200);
+    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+} else {
+    // Nếu không tìm thấy sản phẩm với ID đã cho, trả về lỗi 404 Not Found
+    http_response_code(404);
+    echo json_encode(
+        ["message" => "Không tìm thấy sản phẩm."],
+        JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
+    );
+}
 ?>
