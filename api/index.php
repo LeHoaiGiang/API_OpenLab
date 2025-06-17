@@ -28,21 +28,30 @@ $products = [
 // --- Xử lý yêu cầu ---
 $response = null;
 
-// Kiểm tra xem có tham số 'id' trên URL không
-if (isset($_GET['id'])) {
+// ===================================================================
+// BẮT ĐẦU PHẦN QUAN TRỌNG CẦN KIỂM TRA
+// ===================================================================
+
+// Kiểm tra xem có tham số 'id' trên URL không và nó không rỗng
+if (isset($_GET['id']) && !empty($_GET['id'])) {
     $id = intval($_GET['id']); // Lấy ID và chuyển thành số nguyên
     
     // Tìm sản phẩm có ID tương ứng
     foreach ($products as $product) {
         if ($product['id'] == $id) {
-            $response = $product;
-            break;
+            $response = $product; // Gán sản phẩm tìm thấy vào biến $response
+            break; // Dừng vòng lặp ngay khi tìm thấy
         }
     }
 } else {
-    // Nếu không có ID, trả về tất cả sản phẩm
+    // Nếu không có tham số 'id', trả về tất cả sản phẩm
     $response = $products;
 }
+
+// ===================================================================
+// KẾT THÚC PHẦN QUAN TRỌNG CẦN KIỂM TRA
+// ===================================================================
+
 
 // --- Trả về phản hồi ---
 if ($response) {
